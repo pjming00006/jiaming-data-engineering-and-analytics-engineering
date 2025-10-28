@@ -34,6 +34,7 @@ resource "aws_iam_policy" "firehose_permission_policy" {
             "Resource": [
                 # Ensure least privilege - only allow write to specific CloudWatch ARN
                 "arn:aws:logs:${var.project_aws_region}:${var.aws_account_id}:log-group:/aws/kinesisfirehose/${aws_kinesis_firehose_delivery_stream.lambda-to-s3-json-stream.name}:log-stream:*",
+                "arn:aws:logs:${var.project_aws_region}:${var.aws_account_id}:log-group:/aws/kinesisfirehose/${aws_kinesis_firehose_delivery_stream.lambda-to-s3-parquet-stream.name}:log-stream:*"
             ]
         },
     ]
@@ -51,7 +52,10 @@ resource "aws_iam_policy" "lambda_permission_policy" {
         {
             "Effect": "Allow",
             "Action": "firehose:PutRecordBatch",
-            "Resource": "arn:aws:firehose:${var.project_aws_region}:${var.aws_account_id}:deliverystream/${aws_kinesis_firehose_delivery_stream.lambda-to-s3-json-stream.name}"
+            "Resource": [
+              "arn:aws:firehose:${var.project_aws_region}:${var.aws_account_id}:deliverystream/${aws_kinesis_firehose_delivery_stream.lambda-to-s3-json-stream.name}",
+              "arn:aws:firehose:${var.project_aws_region}:${var.aws_account_id}:deliverystream/${aws_kinesis_firehose_delivery_stream.lambda-to-s3-parquet-stream.name}"
+            ]
         }
     ]
 })
@@ -178,7 +182,8 @@ resource "aws_lambda_function" "lambda-process-ddb-stream" {
 
   environment {
     variables = {
-      FIREHOSE_DELIVERY_STREAM_NAME = "${aws_kinesis_firehose_delivery_stream.lambda-to-s3-json-stream.name}"
+      FIREHOSE_DELIVERY_STREAM_JSON_NAME = "${aws_kinesis_firehose_delivery_stream.lambda-to-s3-json-stream.name}",
+      FIREHOSE_DELIVERY_STREAM_PARQUET_NAME = "${aws_kinesis_firehose_delivery_stream.lambda-to-s3-parquet-stream.name}"
     }
   }
 }

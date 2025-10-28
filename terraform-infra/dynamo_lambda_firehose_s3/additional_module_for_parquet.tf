@@ -54,7 +54,7 @@ resource "aws_glue_catalog_table" "glub_table_user_parquent" {
     columns {
       name       = "processing_timestamp"
       parameters = {}
-      type       = "timestamp"
+      type       = "string"
     }
 
     columns {

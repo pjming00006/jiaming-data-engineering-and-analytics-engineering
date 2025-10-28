@@ -12,7 +12,8 @@ logger.setLevel(logging.INFO)
 
 # --- Initialization (Runs once during Cold Start) ---
 firehose_client = boto3.client('firehose')
-FIREHOSE_STREAM_NAME = os.environ['FIREHOSE_DELIVERY_STREAM_NAME']
+FIREHOSE_STREAM_NAME_JSON = os.environ['FIREHOSE_DELIVERY_STREAM_JSON_NAME']
+FIREHOSE_STREAM_NAME_PARQUET = os.environ['FIREHOSE_DELIVERY_STREAM_PARQUET_NAME']
 
 # Custom encoder to handle Decimal types (common from DynamoDB Numbers)
 class DecimalEncoder(json.JSONEncoder):
@@ -59,7 +60,7 @@ def lambda_handler(event, context):
     for flexible attributes, then sends a batch to Firehose.
     """
     transformed_records = []
-    current_time_utc = datetime.now(timezone.utc).isoformat()
+    current_time_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     
     # Log the total number of records received in this batch
     logger.info(f"Received {len(event['Records'])} records from DynamoDB Stream.")
@@ -119,18 +120,34 @@ def lambda_handler(event, context):
     if transformed_records:
         try:
             response = firehose_client.put_record_batch(
-                DeliveryStreamName=FIREHOSE_STREAM_NAME,
+                DeliveryStreamName=FIREHOSE_STREAM_NAME_JSON,
                 Records=transformed_records
             )
             # Log success and any failed records
-            failed_count = response.get('FailedPutCount', 0)
+            failed_count = response.get('JSON FailedPutCount', 0)
             if failed_count > 0:
-                logger.error(f"Firehose delivery failed for {failed_count} records.")
+                logger.error(f"JSON Firehose delivery failed for {failed_count} records.")
             else:
-                logger.info(f"Successfully delivered {len(transformed_records)} records to Firehose.")
+                logger.info(f"Successfully delivered {len(transformed_records)} records to JSON Firehose.")
 
         except Exception as e:
-            logger.error(f"CRITICAL: Error putting records to Firehose: {e}")
-            raise 
+            logger.error(f"CRITICAL: Error putting records to JSON Firehose: {e}")
+            raise
+
+        try:
+            response = firehose_client.put_record_batch(
+                DeliveryStreamName=FIREHOSE_STREAM_NAME_PARQUET,
+                Records=transformed_records
+            )
+            # Log success and any failed records
+            failed_count = response.get('PARQUET FailedPutCount', 0)
+            if failed_count > 0:
+                logger.error(f"PARQUET Firehose delivery failed for {failed_count} records.")
+            else:
+                logger.info(f"Successfully delivered {len(transformed_records)} records to PARQUET Firehose.")
+
+        except Exception as e:
+            logger.error(f"CRITICAL: Error putting records to PARQUET Firehose: {e}")
+            raise
 
     return {'statusCode': 200, 'body': f"Processed {len(event['Records'])} records."}

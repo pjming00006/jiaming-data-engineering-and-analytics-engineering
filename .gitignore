@@ -35,3 +35,6 @@ Local package directory created by 'pip install' if used globally
 .aws/
 .local/
 secrets.json
+
+--- Generated data files ---
+data/

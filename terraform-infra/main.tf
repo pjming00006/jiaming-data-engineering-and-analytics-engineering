@@ -18,6 +18,8 @@ provider "aws" {
   region = var.aws_region
 }
 
+data "aws_caller_identity" "current" {}
+
 module "dynamo_lambda_firehose_s3" {
     source = "./dynamo_lambda_firehose_s3"
     project_aws_region = var.aws_region
@@ -27,4 +29,9 @@ module "dynamo_lambda_firehose_s3" {
     aws_account_id = data.aws_caller_identity.current.account_id
 }
 
-data "aws_caller_identity" "current" {}
+module "dbt_analytics" {
+    source = "./dbt_analytics"
+    project_aws_region = var.aws_region
+    project_etl_s3_bucket_name = var.etl_s3_bucket_name
+    aws_account_id = data.aws_caller_identity.current.account_id
+}

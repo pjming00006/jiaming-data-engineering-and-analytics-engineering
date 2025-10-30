@@ -43,6 +43,8 @@ resource "aws_iam_policy" "athena_dbt_analytics_policy" {
           # Allows reading the catalog metadata for dbt operations
           "glue:GetPartition",
           "glue:GetPartitions",
+          "glue:BatchGetPartition",
+          "glue:BatchCreatePartition"
         ],
         Resource = [
           "arn:aws:glue:${var.project_aws_region}:${var.aws_account_id}:catalog",
@@ -50,7 +52,7 @@ resource "aws_iam_policy" "athena_dbt_analytics_policy" {
           # Gives DBT access to read source tables from other databases
           "arn:aws:glue:${var.project_aws_region}:${var.aws_account_id}:database/*",
           # Gives permissions to work with tables
-          "arn:aws:glue:${var.project_aws_region}:${var.aws_account_id}:table/{aws_glue_catalog_database.glub_db_dbt_analytics.name}/*"
+          "arn:aws:glue:${var.project_aws_region}:${var.aws_account_id}:table/${aws_glue_catalog_database.glub_db_dbt_analytics.name}/*"
         ]
       },
       {
@@ -80,7 +82,43 @@ resource "aws_iam_policy" "athena_dbt_analytics_policy" {
           "arn:aws:s3:::${var.project_etl_s3_bucket_name}",
           "arn:aws:s3:::${var.project_etl_s3_bucket_name}/*"
         ]
-      }
+      },
+      {
+            "Sid": "",
+            "Effect": "Allow",
+            "Action": [
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                # Ensure least privilege - only allow write to specific CloudWatch ARN
+                "arn:aws:logs:${var.project_aws_region}:${var.aws_account_id}:log-group:/aws-glue/crawlers:log-stream:*",
+            ]
+        },
     ]
   })
+}
+
+# IAM role for Glue
+resource "aws_iam_role" "glue_service_role" {
+  name          = "glue-dbt-role"
+  description   = "Allow Glue to assume this role for crawler and other data resources required by DBT"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "glue.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+})
+}
+
+# Role policy attachment for dbt
+resource "aws_iam_role_policy_attachment" "athena_dbt_analytics_policy_glue_service_role_attachment" {
+  role       = aws_iam_role.glue_service_role.name
+  policy_arn = aws_iam_policy.athena_dbt_analytics_policy.arn
 }

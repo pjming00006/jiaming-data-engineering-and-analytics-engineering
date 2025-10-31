@@ -6,6 +6,7 @@ SELECT
     , CAST(JSON_EXTRACT(JSON_PARSE(user_attributes), '$.program_id') AS INT)                                         AS program_id
     , CAST(CAST(JSON_EXTRACT(JSON_PARSE(user_attributes), '$.program_start_date') AS VARCHAR) AS DATE)               AS program_start_date
     , CAST(JSON_EXTRACT(JSON_PARSE(user_attributes), '$.client_name') AS VARCHAR)                                    AS client_name
+    , CAST("$path" AS VARCHAR)                                                                                       AS file_path
     , CAST(processing_timestamp AS TIMESTAMP)                                                                        AS updated_at
     , CAST(CURRENT_TIMESTAMP AS TIMESTAMP)                                                                           AS loaded_at
 FROM 

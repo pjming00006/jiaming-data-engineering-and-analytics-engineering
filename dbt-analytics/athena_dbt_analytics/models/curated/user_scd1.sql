@@ -12,6 +12,7 @@ SELECT
     , program_id
     , program_start_date
     , client_name
+    , file_path
     , updated_at
     , CAST(CURRENT_TIMESTAMP AS TIMESTAMP) AS loaded_at
 FROM latest_user

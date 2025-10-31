@@ -101,7 +101,7 @@ resource "aws_iam_policy" "glue_permission_policy" {
 
 # Role policy attachment for firehose for Glue permissions
 resource "aws_iam_role_policy_attachment" "glue_permission_policy_firehose_service_role_attachment" {
-  role       = aws_iam_role.firehose_service_role_lambda.name
+  role       = var.firehose_service_role_name
   policy_arn = aws_iam_policy.glue_permission_policy.arn
 }
 
@@ -111,7 +111,7 @@ resource "aws_kinesis_firehose_delivery_stream" "lambda-to-s3-parquet-stream" {
   destination = "extended_s3"
 
   extended_s3_configuration {
-    role_arn            = aws_iam_role.firehose_service_role_lambda.arn
+    role_arn            = var.firehose_service_role_arn
     bucket_arn          = var.project_etl_s3_bucket_arn
     error_output_prefix = "error-data/"
     prefix              = "dynamo-lambda-firehose-s3-etl-parquet/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
@@ -134,7 +134,7 @@ resource "aws_kinesis_firehose_delivery_stream" "lambda-to-s3-parquet-stream" {
       schema_configuration {
         database_name = aws_glue_catalog_database.glub_db_ddb_lambda_firehose_s3_poc.name
         table_name = aws_glue_catalog_table.glub_table_user_parquent.name
-        role_arn = aws_iam_role.firehose_service_role_lambda.arn
+        role_arn = var.firehose_service_role_arn
       }
     }
   }

@@ -25,11 +25,19 @@ module "s3_datalake" {
   etl_s3_bucket_name = var.etl_s3_bucket_name
 }
 
+module "iam" {
+  source = "./iam"
+}
+
 module "dynamo_lambda_firehose_s3" {
     source = "./dynamo_lambda_firehose_s3"
     project_aws_region = var.aws_region
     project_etl_s3_bucket_name = var.etl_s3_bucket_name
     project_etl_s3_bucket_arn = module.s3_datalake.etl_s3_bucket_arn
+    firehose_service_role_name =  module.iam.firehose_service_role_name
+    firehose_service_role_arn = module.iam.firehose_service_role_arn
+    lambda_service_role_name = module.iam.lambda_service_role_name
+    lambda_service_role_arn = module.iam.lambda_service_role_arn
     lambda_root_path = var.lambda_root_path
     lambda_staged_files_path = var.lambda_staged_files_path
     aws_account_id = data.aws_caller_identity.current.account_id

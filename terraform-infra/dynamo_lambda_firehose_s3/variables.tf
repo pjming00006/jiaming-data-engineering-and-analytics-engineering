@@ -13,6 +13,21 @@ variable "project_etl_s3_bucket_arn" {
   type        = string
 }
 
+variable "firehose_service_role_name" {
+  type        = string
+}
+
+variable "firehose_service_role_arn" {
+  type        = string
+}
+
+variable "lambda_service_role_name" {
+  type        = string
+}
+
+variable "lambda_service_role_arn" {
+  type        = string
+}
 
 variable "project_tag_name" {
   description = "tags for AWS resources under this project"

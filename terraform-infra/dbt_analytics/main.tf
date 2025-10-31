@@ -126,3 +126,29 @@ resource "aws_iam_role_policy_attachment" "start_crawler_policy_lambda_service_r
   role       = var.lambda_service_role_name
   policy_arn = aws_iam_policy.start_all_crawler_policy.arn
 }
+
+# Package the Lambda function code
+data "archive_file" "trigger_crawler_function_file" {
+  type        = "zip"
+  source_file = "${var.lambda_root_path}/trigger_crawler_user_parquet.py"
+  output_path = "${var.lambda_staged_files_path}/trigger_crawler_user_parquet.zip"
+}
+
+# Lambda function
+resource "aws_lambda_function" "lambda_trigger_crawler" {
+  filename         = data.archive_file.trigger_crawler_function_file.output_path
+  function_name    = "trigger_crawler_user_parquet"
+  role             = var.lambda_service_role_arn
+  handler          = "trigger_crawler_user_parquet.lambda_handler"
+  source_code_hash = data.archive_file.trigger_crawler_function_file.output_base64sha256
+
+  architectures    = ["arm64"]
+
+  runtime = "python3.13"
+
+  environment {
+    variables = {
+      USER_PARQUET_GLUE_CRAWLER_NAME = "${aws_glue_crawler.glue_crawler_ddb_user_parquet.name}",
+    }
+  }
+}

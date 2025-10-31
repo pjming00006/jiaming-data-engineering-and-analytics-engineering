@@ -24,6 +24,10 @@ variable "lambda_service_role_name" {
   type = string
 }
 
+variable "lambda_service_role_arn" {
+  type = string
+}
+
 variable "lambda_staged_files_path" {
   type = string
 }

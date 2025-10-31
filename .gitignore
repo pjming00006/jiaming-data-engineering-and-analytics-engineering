@@ -25,6 +25,7 @@ poc-env/
 
 Standard Python cache/build files
 
+.idea/
 pycache/
 *.pyc
 .venv/

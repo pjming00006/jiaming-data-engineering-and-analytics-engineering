@@ -32,7 +32,7 @@ resource "aws_glue_catalog_table" "glub_table_user_parquent" {
     compressed = false
     input_format              = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format             = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-    location                  = "s3://etl-poc-2025-b8a9c11/dynamo-lambda-firehose-s3-etl-parquet/"
+    location                  = "s3://etl-poc-2025-b8a9c11/${var.ddb_user_parquet_s3_prefix}/"
     additional_locations      = []
     bucket_columns            = []
     number_of_buckets         = 0
@@ -114,7 +114,7 @@ resource "aws_kinesis_firehose_delivery_stream" "lambda-to-s3-parquet-stream" {
     role_arn            = var.firehose_service_role_arn
     bucket_arn          = var.project_etl_s3_bucket_arn
     error_output_prefix = "error-data/"
-    prefix              = "dynamo-lambda-firehose-s3-etl-parquet/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
+    prefix              = "${var.ddb_user_parquet_s3_prefix}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
     buffering_interval  = 60
     buffering_size      = 64
 

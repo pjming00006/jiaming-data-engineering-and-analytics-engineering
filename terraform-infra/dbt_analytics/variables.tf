@@ -8,6 +8,10 @@ variable "project_etl_s3_bucket_name" {
   type        = string
 }
 
+variable "ddb_user_parquet_s3_drop_location" {
+  type = string
+}
+
 variable "lambda_root_path" {
   type = string
 }

@@ -134,7 +134,7 @@ data "archive_file" "trigger_crawler_function_file" {
   output_path = "${var.lambda_staged_files_path}/trigger_crawler_user_parquet.zip"
 }
 
-# Lambda function
+# Lambda function to trigger crawler
 resource "aws_lambda_function" "lambda_trigger_crawler" {
   filename         = data.archive_file.trigger_crawler_function_file.output_path
   function_name    = "trigger_crawler_user_parquet"
@@ -151,4 +151,37 @@ resource "aws_lambda_function" "lambda_trigger_crawler" {
       USER_PARQUET_GLUE_CRAWLER_NAME = "${aws_glue_crawler.glue_crawler_ddb_user_parquet.name}",
     }
   }
+}
+
+resource "aws_cloudwatch_event_rule" "user_parquet_s3_file_drop_rule" {
+  name        = "suser_parquet_s3_file_drop_trigger"
+  description = "Trigger Lambda when file is uploaded to specific S3 prefix"
+  event_pattern = jsonencode({
+    "source" : ["aws.s3"],
+    "detail-type" : ["Object Created"],
+    "detail" : {
+      "bucket" : {
+        "name" : [var.project_etl_s3_bucket_name]
+      },
+      "object" : {
+        "key" : [{
+          "prefix" : "${var.ddb_user_parquet_s3_drop_location}/"
+        }]
+      }
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "lambda_target" {
+  rule      = aws_cloudwatch_event_rule.user_parquet_s3_file_drop_rule.name
+  arn       = aws_lambda_function.lambda_trigger_crawler.arn
+}
+
+# Give EventBridge permission to invoke Lambda
+resource "aws_lambda_permission" "allow_eventbridge_invoke" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_trigger_crawler.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.user_parquet_s3_file_drop_rule.arn
 }

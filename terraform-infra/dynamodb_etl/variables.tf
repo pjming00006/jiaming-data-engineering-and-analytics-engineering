@@ -35,6 +35,15 @@ variable "project_tag_name" {
   default     = "ddb-lambda-firehose-s3-etl-poc-project"
 }
 
+variable "ddb_user_parquet_s3_prefix" {
+  type = string
+  default = "dynamo-lambda-firehose-s3-etl-parquet"
+}
+
+output "ddb_user_parquet_s3_drop_location" {
+  value = var.ddb_user_parquet_s3_prefix
+}
+
 variable "lambda_root_path" {
   type = string
 }

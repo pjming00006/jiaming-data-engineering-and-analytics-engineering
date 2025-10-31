@@ -8,10 +8,10 @@ resource "aws_athena_workgroup" "athena_workgroup_dbt_analytics" {
 
   configuration {
     enforce_workgroup_configuration = true
-
-    result_configuration {
-      output_location = "s3://${var.project_etl_s3_bucket_name}/${var.athena_query_output_prefix}"
-    }
+    # Do not set output_location as it would overwrite DBT's output structure
+    # result_configuration {
+    #   output_location = "s3://${var.project_etl_s3_bucket_name}/${var.athena_query_output_prefix}"
+    # }
 
     # 10485760 is the smallest possible value
     bytes_scanned_cutoff_per_query = 10485760

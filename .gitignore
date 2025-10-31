@@ -7,6 +7,15 @@
 *.tfstate.backup
 crash.log
 
+--- DBT Local Resources ---
+dbt-analytics/.user.yml
+dbt-analytics/profiles.yml
+dbt-analytics/logs/
+
+dbt-analytics/athena_dbt_analytics/target/
+dbt-analytics/athena_dbt_analytics/dbt_packages/
+dbt-analytics/athena_dbt_analytics/logs/
+
 --- Local Python Environment ---
 
 The pyenv virtual environment folder

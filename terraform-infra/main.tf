@@ -29,8 +29,8 @@ module "iam" {
   source = "./iam"
 }
 
-module "dynamo_lambda_firehose_s3" {
-    source = "./dynamo_lambda_firehose_s3"
+module "dynamodb_etl" {
+    source = "./dynamodb_etl"
     project_aws_region = var.aws_region
     project_etl_s3_bucket_name = var.etl_s3_bucket_name
     project_etl_s3_bucket_arn = module.s3_datalake.etl_s3_bucket_arn

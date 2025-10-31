@@ -1,5 +1,5 @@
 SELECT
-    TO_HEX(MD5(CAST(CONCAT_WS(' ', CAST(user_id AS VARCHAR), CAST(processing_timestamp AS VARCHAR)) AS VARBINARY)))  AS user_cdc_id
+    {{ generate_primary_key(['user_id', 'processing_timestamp']) }}                                                  AS user_cdc_id
     , CAST(user_id AS VARCHAR)                                                                                       AS user_id
     , CAST(cdc_type AS VARCHAR)                                                                                      AS event_type
     , CAST(JSON_EXTRACT(JSON_PARSE(user_attributes), '$.partner_id') AS INT)                                         AS partner_id

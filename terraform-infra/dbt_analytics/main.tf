@@ -98,8 +98,31 @@ resource "aws_iam_policy" "athena_dbt_analytics_policy" {
   })
 }
 
+resource "aws_iam_policy" "start_all_crawler_policy" {
+  # This policy allows AWS lambda to write to a specific firehose stream
+  name = "startAllCrawlerPolicy"
+  path = "/service-role/"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {   
+            "Effect": "Allow",
+            "Action": "glue:StartCrawler",
+            "Resource": "*"
+        }
+    ]
+})
+}
+
 # Role policy attachment for dbt
 resource "aws_iam_role_policy_attachment" "athena_dbt_analytics_policy_glue_service_role_attachment" {
   role       = var.glue_service_role_name
   policy_arn = aws_iam_policy.athena_dbt_analytics_policy.arn
+}
+
+# Role policy attachment for lambda to start crawler
+resource "aws_iam_role_policy_attachment" "start_crawler_policy_lambda_service_role_attachment" {
+  role       = var.lambda_service_role_name
+  policy_arn = aws_iam_policy.start_all_crawler_policy.arn
 }

@@ -61,43 +61,6 @@ resource "aws_iam_policy" "lambda_permission_policy" {
 })
 }
 
-# # IAM role for firehose
-# resource "aws_iam_role" "firehose_service_role_lambda" {
-#   name = "KinesisFirehoseServiceRole-lambda"
-
-#   assume_role_policy = jsonencode({
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Principal": {
-#                 "Service": "firehose.amazonaws.com"
-#             },
-#             "Action": "sts:AssumeRole"
-#         }
-#     ]
-# })
-# }
-
-# # IAM role for Lambda
-# resource "aws_iam_role" "lambda_service_role" {
-#   name          = "lambda-dynamoDB-firehose-poc-role"
-#   description   = "Allows Lambda functions to call AWS services on your behalf, and send data to firehose"
-
-#   assume_role_policy = jsonencode({
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Principal": {
-#                 "Service": "lambda.amazonaws.com"
-#             },
-#             "Action": "sts:AssumeRole"
-#         }
-#     ]
-# })
-# }
-
 # Role policy attachment for firehose
 resource "aws_iam_role_policy_attachment" "firehose_permission_policy_firehose_service_role_lambda_attachment" {
   role       = var.firehose_service_role_name

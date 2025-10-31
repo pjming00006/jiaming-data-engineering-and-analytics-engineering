@@ -46,5 +46,6 @@ models:
     curated:
       +schema: curated
       
-      curated_user:
-        +materialized: table
+      user_scd1:
+        +materialized: incremental
+        +unique_key: user_id

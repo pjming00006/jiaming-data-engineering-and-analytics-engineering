@@ -47,6 +47,8 @@ module "dbt_analytics" {
     source = "./dbt_analytics"
     project_aws_region = var.aws_region
     project_etl_s3_bucket_name = var.etl_s3_bucket_name
+    glue_service_role_name = module.iam.glue_service_role_name
+    glue_service_role_arn = module.iam.glue_service_role_arn
     lambda_root_path = var.lambda_root_path
     lambda_staged_files_path = var.lambda_staged_files_path
     aws_account_id = data.aws_caller_identity.current.account_id

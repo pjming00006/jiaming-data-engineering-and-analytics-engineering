@@ -1,7 +1,7 @@
 resource "aws_glue_crawler" "glue_crawler_ddb_user_parquet" {
   database_name = aws_glue_catalog_database.glub_db_dbt_analytics.name
   name          = "glue-crawler-ddb-user-parquet"
-  role          = aws_iam_role.glue_service_role.arn
+  role          = var.glue_service_role_arn
 
   configuration = jsonencode({
     CreatePartitionIndex = true

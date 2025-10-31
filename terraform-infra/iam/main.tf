@@ -50,3 +50,31 @@ output "lambda_service_role_name" {
 output "lambda_service_role_arn" {
   value = aws_iam_role.lambda_service_role.arn
 }
+
+# IAM role for Glue
+resource "aws_iam_role" "glue_service_role" {
+  name          = "glue-dbt-role"
+  description   = "Allow Glue to assume this role for crawler and other data resources required by DBT"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "glue.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+})
+}
+
+
+output "glue_service_role_name" {
+  value = aws_iam_role.glue_service_role.name
+}
+
+output "glue_service_role_arn" {
+  value = aws_iam_role.glue_service_role.arn
+}

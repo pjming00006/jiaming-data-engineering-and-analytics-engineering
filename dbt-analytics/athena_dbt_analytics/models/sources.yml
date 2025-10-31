@@ -1,0 +1,7 @@
+version: 2
+
+sources:
+  - name: dbt-analytics
+    database: AwsDataCatalog
+    tables:
+      - name: dynamo_lambda_firehose_s3_etl_parquet # Name of the table in Athena

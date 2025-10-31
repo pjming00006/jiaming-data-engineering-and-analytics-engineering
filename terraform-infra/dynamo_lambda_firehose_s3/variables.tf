@@ -8,6 +8,12 @@ variable "project_etl_s3_bucket_name" {
   type        = string
 }
 
+variable "project_etl_s3_bucket_arn" {
+  description = "s3 bucket arn"
+  type        = string
+}
+
+
 variable "project_tag_name" {
   description = "tags for AWS resources under this project"
   type        = string

@@ -112,7 +112,8 @@ resource "aws_kinesis_firehose_delivery_stream" "lambda-to-s3-parquet-stream" {
 
   extended_s3_configuration {
     role_arn            = aws_iam_role.firehose_service_role_lambda.arn
-    bucket_arn          = aws_s3_bucket.etl_s3_bucket.arn
+    # bucket_arn          = aws_s3_bucket.etl_s3_bucket.arn
+    bucket_arn          = var.project_etl_s3_bucket_arn
     error_output_prefix = "error-data/"
     prefix              = "dynamo-lambda-firehose-s3-etl-parquet/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
     buffering_interval  = 60

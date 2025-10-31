@@ -20,10 +20,16 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
+module "s3_datalake" {
+  source = "./s3_datalake"
+  etl_s3_bucket_name = var.etl_s3_bucket_name
+}
+
 module "dynamo_lambda_firehose_s3" {
     source = "./dynamo_lambda_firehose_s3"
     project_aws_region = var.aws_region
     project_etl_s3_bucket_name = var.etl_s3_bucket_name
+    project_etl_s3_bucket_arn = module.s3_datalake.etl_s3_bucket_arn
     lambda_root_path = var.lambda_root_path
     lambda_staged_files_path = var.lambda_staged_files_path
     aws_account_id = data.aws_caller_identity.current.account_id

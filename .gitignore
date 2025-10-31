@@ -5,6 +5,7 @@
 *.tfstate
 *.tfstate.
 *.tfstate.backup
+*.tfstate.*.backup
 crash.log
 
 --- DBT Local Resources ---

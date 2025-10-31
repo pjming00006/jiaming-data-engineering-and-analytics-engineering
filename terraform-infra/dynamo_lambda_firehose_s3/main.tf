@@ -116,26 +116,6 @@ resource "aws_iam_role_policy_attachment" "lambda_permission_policy_lambda_servi
   policy_arn = aws_iam_policy.lambda_permission_policy.arn
 }
 
-# # s3 bucket
-# resource "aws_s3_bucket" "etl_s3_bucket" {
-#   bucket = var.project_etl_s3_bucket_name
-# }
-
-# # s3 bucket notification to EventBridge - this is for the dbt analytics project
-# resource "aws_s3_bucket_notification" "bucket_notification" {
-#   bucket      = aws_s3_bucket.etl_s3_bucket.id
-#   eventbridge = true
-# }
-
-# # S3 Best Practice: Block all public access for security
-# resource "aws_s3_bucket_public_access_block" "data_lake_acl" {
-#   bucket = aws_s3_bucket.etl_s3_bucket.id
-#   block_public_acls       = true
-#   block_public_policy     = true
-#   ignore_public_acls      = true
-#   restrict_public_buckets = true
-# }
-
 resource "aws_dynamodb_table" "dynamodb_user_table" {
   name             = "user"
   hash_key         = "user_id"
@@ -160,7 +140,6 @@ resource "aws_kinesis_firehose_delivery_stream" "lambda-to-s3-json-stream" {
 
   extended_s3_configuration {
     role_arn            = aws_iam_role.firehose_service_role_lambda.arn
-    # bucket_arn          = aws_s3_bucket.etl_s3_bucket.arn
     bucket_arn          = var.project_etl_s3_bucket_arn
     error_output_prefix = "error-data/"
     prefix              = "dynamo-lambda-firehose-s3-etl-json/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"

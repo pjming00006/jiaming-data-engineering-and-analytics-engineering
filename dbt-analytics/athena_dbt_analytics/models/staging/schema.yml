@@ -1,0 +1,35 @@
+version: 2
+
+models:
+- name: user_cdc
+  description: user cdc data
+  columns:
+    - name: user_cdc_id
+      data_type: VARCHAR
+      tests:
+        - not_null
+        - unique
+    - name: user_id
+      data_type: VARCHAR
+      tests:
+        - not_null
+    - name: event_type
+      data_type: VARCHAR
+      tests:
+        - not_null
+    - name: partner_id
+      data_type: INT
+    - name: program_id
+      data_type: INT
+    - name: program_start_date
+      data_type: DATE
+    - name: client_name
+      data_type: VARCHAR
+    - name: updated_at
+      data_type: TIMESTAMP
+      tests:
+        - not_null
+    - name: loaded_at
+      data_type: TIMESTAMP
+      tests:
+        - not_null

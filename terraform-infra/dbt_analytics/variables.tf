@@ -8,6 +8,14 @@ variable "project_etl_s3_bucket_name" {
   type        = string
 }
 
+variable "lambda_root_path" {
+  type = string
+}
+
+variable "lambda_staged_files_path" {
+  type = string
+}
+
 variable "aws_account_id" {
   type = string
 }

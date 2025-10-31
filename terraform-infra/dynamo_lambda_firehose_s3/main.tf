@@ -116,8 +116,15 @@ resource "aws_iam_role_policy_attachment" "lambda_permission_policy_lambda_servi
   policy_arn = aws_iam_policy.lambda_permission_policy.arn
 }
 
+# s3 bucket
 resource "aws_s3_bucket" "etl_s3_bucket" {
   bucket = var.project_etl_s3_bucket_name
+}
+
+# s3 bucket notification to EventBridge - this is for the dbt analytics project
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket      = aws_s3_bucket.etl_s3_bucket.id
+  eventbridge = true
 }
 
 # S3 Best Practice: Block all public access for security

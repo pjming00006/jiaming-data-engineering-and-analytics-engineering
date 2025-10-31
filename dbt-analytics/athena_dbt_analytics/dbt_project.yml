@@ -48,4 +48,8 @@ models:
       
       user_scd1:
         +materialized: incremental
-        +unique_key: user_id
+        +unique_key: user_scd1_id
+
+      user_scd2:
+        +materialized: incremental
+        +unique_key: user_scd2_id

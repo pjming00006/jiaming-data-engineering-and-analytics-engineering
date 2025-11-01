@@ -1,6 +1,10 @@
 resource "aws_glue_catalog_database" "glub_db_dbt_analytics" {
   name = "dbt-analytics"
   description = "Poc Database for DBT analytics"
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 resource "aws_athena_workgroup" "athena_workgroup_dbt_analytics" {
@@ -19,6 +23,10 @@ resource "aws_athena_workgroup" "athena_workgroup_dbt_analytics" {
   }
   description = "Athena workgroup for analytics (managed results + per-query cap)"
   state = "ENABLED"
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 resource "aws_iam_policy" "athena_dbt_analytics_policy" {
@@ -96,6 +104,10 @@ resource "aws_iam_policy" "athena_dbt_analytics_policy" {
         },
     ]
   })
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 resource "aws_iam_policy" "start_all_crawler_policy" {
@@ -112,7 +124,11 @@ resource "aws_iam_policy" "start_all_crawler_policy" {
             "Resource": "*"
         }
     ]
-})
+  })
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 # Role policy attachment for dbt
@@ -151,6 +167,10 @@ resource "aws_lambda_function" "lambda_trigger_crawler" {
       USER_PARQUET_GLUE_CRAWLER_NAME = "${aws_glue_crawler.glue_crawler_ddb_user_parquet.name}",
     }
   }
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 resource "aws_cloudwatch_event_rule" "user_parquet_s3_file_drop_rule" {
@@ -170,6 +190,10 @@ resource "aws_cloudwatch_event_rule" "user_parquet_s3_file_drop_rule" {
       }
     }
   })
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 resource "aws_cloudwatch_event_target" "lambda_target" {

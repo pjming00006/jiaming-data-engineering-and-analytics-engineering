@@ -11,4 +11,8 @@ resource "aws_glue_crawler" "glue_crawler_ddb_user_parquet" {
   s3_target {
     path = "s3://${var.project_etl_s3_bucket_name}/dynamo-lambda-firehose-s3-etl-parquet/"
   }
+
+  tags = {
+    project = var.project_tag
+  }
 }

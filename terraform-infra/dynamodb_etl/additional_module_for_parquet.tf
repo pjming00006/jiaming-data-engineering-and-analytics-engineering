@@ -1,6 +1,10 @@
 resource "aws_glue_catalog_database" "glub_db_ddb_lambda_firehose_s3_poc" {
   name = "ddb-lambda-firehose-s3-etl-poc-db"
   description = "PoC database for ddb - lambda - firehose - s3 project"
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 resource "aws_glue_catalog_table" "glub_table_user_parquent" {
@@ -96,7 +100,11 @@ resource "aws_iam_policy" "glue_permission_policy" {
 
         }
     ]
-})
+  })
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 # Role policy attachment for firehose for Glue permissions
@@ -139,4 +147,7 @@ resource "aws_kinesis_firehose_delivery_stream" "lambda-to-s3-parquet-stream" {
     }
   }
 
+  tags = {
+    project = var.project_tag
+  }
 }

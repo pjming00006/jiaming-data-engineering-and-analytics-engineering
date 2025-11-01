@@ -38,7 +38,11 @@ resource "aws_iam_policy" "firehose_permission_policy" {
             ]
         },
     ]
-})
+  })
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 resource "aws_iam_policy" "lambda_permission_policy" {
@@ -58,7 +62,11 @@ resource "aws_iam_policy" "lambda_permission_policy" {
             ]
         }
     ]
-})
+  })
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 # Role policy attachment for firehose
@@ -94,6 +102,10 @@ resource "aws_dynamodb_table" "dynamodb_user_table" {
   stream_enabled   = true
   # NEW_AND_OLD_IMAGES is required to fully capture changes for DDB->Lambda transform
   stream_view_type = "NEW_AND_OLD_IMAGES"
+
+  tags = {
+    project = var.project_tag
+  }
 }
 
 
@@ -108,6 +120,10 @@ resource "aws_kinesis_firehose_delivery_stream" "lambda-to-s3-json-stream" {
     prefix              = "dynamo-lambda-firehose-s3-etl-json/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
     buffering_interval  = 60
     buffering_size      = 1
+  }
+
+  tags = {
+    project = var.project_tag
   }
 }
 
@@ -135,5 +151,9 @@ resource "aws_lambda_function" "lambda-process-ddb-stream" {
       FIREHOSE_DELIVERY_STREAM_JSON_NAME = "${aws_kinesis_firehose_delivery_stream.lambda-to-s3-json-stream.name}",
       FIREHOSE_DELIVERY_STREAM_PARQUET_NAME = "${aws_kinesis_firehose_delivery_stream.lambda-to-s3-parquet-stream.name}"
     }
+  }
+
+  tags = {
+    project = var.project_tag
   }
 }

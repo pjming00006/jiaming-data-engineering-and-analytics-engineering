@@ -41,6 +41,7 @@ module "dynamodb_etl" {
     lambda_root_path = var.lambda_root_path
     lambda_staged_files_path = var.lambda_staged_files_path
     aws_account_id = data.aws_caller_identity.current.account_id
+    project_tag = var.project_tag
 }
 
 module "dbt_analytics" {
@@ -55,4 +56,5 @@ module "dbt_analytics" {
     lambda_root_path = var.lambda_root_path
     lambda_staged_files_path = var.lambda_staged_files_path
     aws_account_id = data.aws_caller_identity.current.account_id
+    project_tag = var.project_tag
 }

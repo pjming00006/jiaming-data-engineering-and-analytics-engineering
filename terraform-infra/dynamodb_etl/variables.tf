@@ -55,3 +55,7 @@ variable "lambda_staged_files_path" {
 variable "aws_account_id" {
   type = string
 }
+
+variable "project_tag" {
+  type = string
+}

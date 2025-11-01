@@ -44,3 +44,7 @@ variable "athena_query_output_prefix" {
   type = string
   default = "dbt-analytics-queries/"
 }
+
+variable "project_tag" {
+  type = string
+}

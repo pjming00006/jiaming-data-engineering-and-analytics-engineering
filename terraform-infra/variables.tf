@@ -11,13 +11,16 @@ variable "etl_s3_bucket_name" {
 }
 
 variable "lambda_root_path" {
-  description = "value"
   type = string
   default = "../lambda"
 }
 
 variable "lambda_staged_files_path" {
-  description = "value"
   type = string
   default = "../lambda/staged_files"
+}
+
+variable "project_tag" {
+  type = string
+  default = "DE ETL"
 }

@@ -13,7 +13,7 @@ resource "aws_iam_role" "firehose_service_role_lambda" {
             "Action": "sts:AssumeRole"
         }
     ]
-})
+  })
 }
 
 output "firehose_service_role_name" {
@@ -40,7 +40,7 @@ resource "aws_iam_role" "lambda_service_role" {
             "Action": "sts:AssumeRole"
         }
     ]
-})
+  })
 }
 
 output "lambda_service_role_name" {
@@ -67,7 +67,7 @@ resource "aws_iam_role" "glue_service_role" {
             "Action": "sts:AssumeRole"
         }
     ]
-})
+  })
 }
 
 
@@ -77,4 +77,22 @@ output "glue_service_role_name" {
 
 output "glue_service_role_arn" {
   value = aws_iam_role.glue_service_role.arn
+}
+
+# IAM role for dms - documentdb -> dms -> s3 pipeline
+resource "aws_iam_role" "dms_service_role" {
+  name = "dms-service-role"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "dms.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+  })
 }

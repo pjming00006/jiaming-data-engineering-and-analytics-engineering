@@ -96,3 +96,12 @@ resource "aws_iam_role" "dms_service_role" {
     ]
   })
 }
+
+output "dms_service_role_id" {
+  value = aws_iam_role.dms_service_role.id
+}
+
+output "dms_service_role_name" {
+  value = aws_iam_role.dms_service_role.name
+}
+

@@ -13,6 +13,14 @@ variable "project_etl_s3_bucket_arn" {
   type        = string
 }
 
+variable "dms_service_role_id" {
+  type = string
+}
+
+variable "dms_service_role_name" {
+  type = string
+}
+
 variable "aws_account_id" {
   type = string
 }

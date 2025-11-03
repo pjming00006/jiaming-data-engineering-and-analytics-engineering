@@ -80,7 +80,7 @@ resource "aws_docdb_cluster" "docdb" {
   }
 
   lifecycle {
-    ignore_changes = [master_username, master_password]
+    ignore_changes = [cluster_members]
   }
 }
 
@@ -99,4 +99,75 @@ resource "aws_instance" "docdb_client" {
   associate_public_ip_address = true
   user_data_base64 = base64encode(file("${var.utils_file_path}/docdb_ec2_client_setup.sh"))
   user_data_replace_on_change = true
+}
+
+# Policy for DMS to interact with s3
+resource "aws_iam_policy" "dms_s3_permission_policy" {
+  name = "dms_s3_permission_policy"
+  path = "/service-role/"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {  
+            "Sid": "",
+            "Effect": "Allow",
+            "Action": [
+                "s3:AbortMultipartUpload",
+                "s3:GetBucketLocation",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+                "s3:PutObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${var.project_etl_s3_bucket_name}",
+                "arn:aws:s3:::${var.project_etl_s3_bucket_name}/*"
+            ]
+        },
+        # {
+        #     "Sid": "",
+        #     "Effect": "Allow",
+        #     "Action": [
+        #         "logs:PutLogEvents"
+        #     ],
+        #     "Resource": [
+        #         # Ensure least privilege - only allow write to specific CloudWatch ARN
+        #         "arn:aws:logs:${var.project_aws_region}:${var.aws_account_id}:log-group:/aws/dms/${aws_kinesis_firehose_delivery_stream.lambda-to-s3-json-stream.name}:log-stream:*",
+        #         "arn:aws:logs:${var.project_aws_region}:${var.aws_account_id}:log-group:/aws/dms/${aws_kinesis_firehose_delivery_stream.lambda-to-s3-parquet-stream.name}:log-stream:*"
+        #     ]
+        # },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "dms_secrets_policy" {
+  name = "dms_secrets_policy"
+  path = "/service-role/"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "secretsmanager:GetSecretValue"
+        ],
+        "Resource": [
+          "${aws_secretsmanager_secret.docdb_cluster_user_secret.arn}"
+        ]
+      }
+    ]
+  })
+}
+
+# Role policy attachment for DMS
+resource "aws_iam_role_policy_attachment" "dms_s3_permission_policy_dms_service_role_attachment" {
+  role       = var.dms_service_role_name
+  policy_arn = aws_iam_policy.dms_s3_permission_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "dms_secrets_policy_dms_service_role_attachment" {
+  role       = var.dms_service_role_name
+  policy_arn = aws_iam_policy.dms_secrets_policy.arn
 }

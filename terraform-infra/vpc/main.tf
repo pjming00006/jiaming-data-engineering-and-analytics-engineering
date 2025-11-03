@@ -41,6 +41,18 @@ resource "aws_subnet" "docdb_vpc_private_subnet" {
   }
 }
 
+# Second private subnet required for a minimum dms poc
+resource "aws_subnet" "docdb_vpc_private_subnet_2" {
+  vpc_id                  = aws_vpc.docdb_vpc.id
+  cidr_block              = "10.0.3.0/24"
+  availability_zone       = "us-east-1c"
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "poc-private-subnet"
+  }
+}
+
 # Create a route table for the subnet
 resource "aws_route_table" "docdb_vpc_public_subnet_route_table" {
   vpc_id = aws_vpc.docdb_vpc.id

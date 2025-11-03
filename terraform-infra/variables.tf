@@ -20,6 +20,11 @@ variable "lambda_staged_files_path" {
   default = "../lambda/staged_files"
 }
 
+variable "utils_file_path" {
+  type = string
+  default = "../utils"
+}
+
 variable "project_tag" {
   type = string
   default = "DE ETL"

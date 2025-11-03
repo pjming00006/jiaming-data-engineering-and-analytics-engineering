@@ -97,4 +97,6 @@ resource "aws_instance" "docdb_client" {
   vpc_security_group_ids      = [aws_security_group.ec2_ssh_sg.id, aws_security_group.docdb_sg.id]
   subnet_id                   = var.docdb_vpc_public_subnet_id
   associate_public_ip_address = true
+  user_data_base64 = base64encode(file("${var.utils_file_path}/docdb_ec2_client_setup.sh"))
+  user_data_replace_on_change = true
 }

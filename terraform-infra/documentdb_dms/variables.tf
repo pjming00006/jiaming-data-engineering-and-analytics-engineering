@@ -29,6 +29,11 @@ variable "AWS_DOCDB_PASSWORD" {
     default = "my_docdb_password"
 }
 
+variable "utils_file_path" {
+  type = string
+  default = "../utils"
+}
+
 variable "current_ip_address" {
   type = string
 }

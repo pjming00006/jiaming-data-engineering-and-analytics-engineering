@@ -80,6 +80,7 @@ module "documentdb_dms" {
   docdb_vpc_id = module.vpc.docdb_vpc_id
   docdb_vpc_public_subnet_id = module.vpc.docdb_vpc_public_subnet_id
   docdb_vpc_private_subnet_id = module.vpc.docdb_vpc_private_subnet_id
+  utils_file_path = var.utils_file_path
 }
 
 module "vpc" {

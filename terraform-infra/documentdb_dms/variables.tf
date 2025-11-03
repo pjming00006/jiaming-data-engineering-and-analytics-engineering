@@ -17,6 +17,34 @@ variable "aws_account_id" {
   type = string
 }
 
+variable "AWS_DOCDB_USERNAME" {
+    type = string
+    sensitive = true
+    default = "my_docdb_username"
+}
+
+variable "AWS_DOCDB_PASSWORD" {
+    type = string
+    sensitive = true
+    default = "my_docdb_password"
+}
+
+variable "current_ip_address" {
+  type = string
+}
+
+variable "docdb_vpc_id" {
+  type = string
+}
+
+variable "docdb_vpc_public_subnet_id" {
+  type = string
+}
+
+variable "docdb_vpc_private_subnet_id" {
+  type = string
+}
+
 variable "project_tag" {
   type = string
 }

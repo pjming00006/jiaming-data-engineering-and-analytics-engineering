@@ -2,12 +2,18 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.92"
+      # version = "~> 5.92"
+      version = "~> 6.10"
     }
 
     archive = {
       source = "hashicorp/archive"
       version = ">= 2.2.0"
+    }
+
+    external = {
+      source = "hashicorp/external"
+      version = ">= 2.3.5"
     }
   }
 
@@ -27,6 +33,10 @@ module "s3_datalake" {
 
 module "iam" {
   source = "./iam"
+}
+
+data "external" "myipaddr" {
+program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
 }
 
 module "dynamodb_etl" {
@@ -66,4 +76,12 @@ module "documentdb_dms" {
   project_etl_s3_bucket_arn = module.s3_datalake.etl_s3_bucket_arn
   aws_account_id = data.aws_caller_identity.current.account_id
   project_tag = var.project_tag
+  current_ip_address = data.external.myipaddr.result.ip
+  docdb_vpc_id = module.vpc.docdb_vpc_id
+  docdb_vpc_public_subnet_id = module.vpc.docdb_vpc_public_subnet_id
+  docdb_vpc_private_subnet_id = module.vpc.docdb_vpc_private_subnet_id
+}
+
+module "vpc" {
+  source = "./vpc"
 }

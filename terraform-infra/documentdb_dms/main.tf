@@ -234,18 +234,6 @@ resource "aws_dms_endpoint" "docdb_source_endpoint" {
   password                        = jsondecode(aws_secretsmanager_secret_version.docdb_password_version.secret_string)["password"]
 }
 
-resource "aws_vpc_endpoint" "etl_vpc_s3_endpoint" {
-  vpc_id            = var.docdb_vpc_id
-  service_name      = "com.amazonaws.us-east-1.s3"
-  vpc_endpoint_type = "Gateway"
-
-  private_dns_enabled = false
-
-  tags = {
-    Name = "dms-s3-private-endpoint"
-  }
-}
-
 resource "aws_dms_replication_instance" "dms_docdb_instance" {
   replication_instance_id   = "docdb-dms-replication-instance"
   replication_instance_class = "dms.t3.micro"

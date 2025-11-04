@@ -82,7 +82,7 @@ module "documentdb_dms" {
   project_tag = var.project_tag
   current_ip_address = data.external.myipaddr.result.ip
   docdb_vpc_id = module.vpc.docdb_vpc_id
-  docdb_vpc_public_subnet_id = module.vpc.docdb_vpc_public_subnet_id
+  docdb_vpc_public_subnet_id = module.vpc.de_etl_vpc_public_subnet_id
   docdb_vpc_private_subnet_id = module.vpc.docdb_vpc_private_subnet_id
   utils_file_path = var.utils_file_path
 }

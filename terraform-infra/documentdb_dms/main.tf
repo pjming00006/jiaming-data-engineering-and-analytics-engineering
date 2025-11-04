@@ -1,3 +1,29 @@
+/*
+Resource Overview: In this project, the main target is to configure a DocumentDB cluster and and Data Migration Service instance to migrate data to s3. In addition,
+we need to be able to connect to the DocumentDB cluster and write some sample data into the database
+
+Prerequisites Overview:
+1. DocumentDB is not a service fully managed by AWS; therefore, we would need to manage our own network and compute infrastructures
+2. DocumentDB does not allow direct access from the Internet; therefore, we would need a EC2 instance within the same VPC to serve as DB client
+3. Similarly, DMS resources must be placed within the same network; for best practices, DMS instances shouldn't be exposed to public subnets
+
+Prerequisites Details:
+1. A dedicated VPC for the project
+2. The VPC should have 1 public subnet and at least 2 private subnet. DocumentDB cluster and its instance(minnimum 1) reside in each of the private subnets
+3. A VPC security group allowing inbound traffic to port 27017(mongodb), and inbound traffic for ssh(port 22) from user ip
+4  An VPC s3 endpoint allowing DMS to interact with s3 within the private subnet
+5. A DocumentDB cluster and 1 storage instance. Use provisioned resources, for ease of testing. The cluster uses the VPC created
+6. An EC2 instance using the same VPC. Use an older version of Ubuntu for mongo compatibility
+7. DMS source and target endpoint for DocumentDB cluster and s3
+8. DMS replication instance lieveraging the endpoints; use provisioned resources for ease of testing
+9. The actual replication task is not managed here since it's created by the replication instance; delete it after use to prevent recurring costs
+
+Resource dependencies:
+- For s3 bucket and related resources, see terraform-infra/s3_datalake
+- For networking resources like VPC and subnets, see terraform-infra/vpc
+- For IAM service role resources, see terraform-infra/iam(policy and attachment are managed under project module instead)
+*/
+
 locals {
   high_cost_resource_tag = "High Cost"
 }

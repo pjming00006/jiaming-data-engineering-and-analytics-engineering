@@ -30,7 +30,7 @@ resource "aws_subnet" "de_etl_vpc_public_subnet" {
 }
 
 # Private subnet for DocumentDB
-resource "aws_subnet" "docdb_vpc_private_subnet" {
+resource "aws_subnet" "de_etl_vpc_private_subnet" {
   vpc_id                  = aws_vpc.de_etl_vpc.id
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "us-east-1b"
@@ -42,7 +42,7 @@ resource "aws_subnet" "docdb_vpc_private_subnet" {
 }
 
 # Second private subnet required for a minimum dms poc
-resource "aws_subnet" "docdb_vpc_private_subnet_2" {
+resource "aws_subnet" "de_etl_vpc_private_subnet_2" {
   vpc_id                  = aws_vpc.de_etl_vpc.id
   cidr_block              = "10.0.3.0/24"
   availability_zone       = "us-east-1c"
@@ -54,7 +54,7 @@ resource "aws_subnet" "docdb_vpc_private_subnet_2" {
 }
 
 output "private_subnet_ids" {
-  value = [aws_subnet.docdb_vpc_private_subnet.id, aws_subnet.docdb_vpc_private_subnet_2.id]
+  value = [aws_subnet.de_etl_vpc_private_subnet.id, aws_subnet.de_etl_vpc_private_subnet_2.id]
 }
 
 # Create a route table for the subnet
@@ -86,5 +86,5 @@ output "de_etl_vpc_public_subnet_id" {
 }
 
 output "docdb_vpc_private_subnet_id" {
-    value = aws_subnet.docdb_vpc_private_subnet.id
+    value = aws_subnet.de_etl_vpc_private_subnet.id
 }

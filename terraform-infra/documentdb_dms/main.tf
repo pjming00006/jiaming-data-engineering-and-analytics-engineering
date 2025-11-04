@@ -79,7 +79,7 @@ resource "aws_docdb_cluster" "docdb" {
     ignore_changes = [master_username, master_password]
   }
 
-  tags_all = {
+  tags = {
     project = var.project_tag
     cost    = local.high_cost_resource_tag
   }
@@ -91,6 +91,11 @@ resource "aws_docdb_cluster_instance" "docdb_instance_1" {
   cluster_identifier  = aws_docdb_cluster.docdb.id
   instance_class      = "db.t3.medium"      # choose any supported provisioned instance class
   engine              = "docdb"
+
+  tags = {
+    project = var.project_tag
+    cost    = local.high_cost_resource_tag
+  }
 }
 
 resource "aws_instance" "docdb_client" {
@@ -102,6 +107,11 @@ resource "aws_instance" "docdb_client" {
   associate_public_ip_address = true
   user_data_base64 = base64encode(file("${var.utils_file_path}/docdb_ec2_client_setup.sh"))
   user_data_replace_on_change = true
+
+  tags = {
+    project = var.project_tag
+    cost    = local.high_cost_resource_tag
+  }
 }
 
 # Policy for DMS to interact with s3
@@ -198,13 +208,27 @@ resource "aws_dms_endpoint" "docdb_source_endpoint" {
   password                        = jsondecode(aws_secretsmanager_secret_version.docdb_password_version.secret_string)["password"]
 }
 
+resource "aws_vpc_endpoint" "etl_vpc_s3_endpoint" {
+  vpc_id            = var.docdb_vpc_id
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
+
+  private_dns_enabled = false
+
+  tags = {
+    Name = "dms-s3-private-endpoint"
+  }
+}
+
 resource "aws_dms_replication_instance" "dms_docdb_instance" {
   replication_instance_id   = "docdb-dms-replication-instance"
   replication_instance_class = "dms.t3.micro"
   publicly_accessible       = true
   vpc_security_group_ids    = [aws_security_group.docdb_sg.id]
   replication_subnet_group_id = aws_dms_replication_subnet_group.dms_subnet_group.id
+
   tags = {
-    Name = "DMS PoC Replication Instance"
+    project = var.project_tag
+    cost    = local.high_cost_resource_tag
   }
 }

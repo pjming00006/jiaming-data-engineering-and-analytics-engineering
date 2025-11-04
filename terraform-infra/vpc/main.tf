@@ -4,7 +4,7 @@ resource "aws_vpc" "docdb_vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "poc-vpc"
+    Name = "de-etl-vpc"
   }
 }
 
@@ -13,7 +13,7 @@ resource "aws_internet_gateway" "docdb_vpc_igw" {
   vpc_id = aws_vpc.docdb_vpc.id
 
   tags = {
-    Name = "poc-igw"
+    Name = "de-etl-igw"
   }
 }
 
@@ -25,7 +25,7 @@ resource "aws_subnet" "docdb_vpc_public_subnet" {
   map_public_ip_on_launch = true  # auto-assign public IPs to EC2s
 
   tags = {
-    Name = "poc-public-subnet"
+    Name = "de-etl-public-subnet"
   }
 }
 
@@ -37,7 +37,7 @@ resource "aws_subnet" "docdb_vpc_private_subnet" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "poc-private-subnet"
+    Name = "de-etl-private-subnet_1"
   }
 }
 
@@ -49,7 +49,7 @@ resource "aws_subnet" "docdb_vpc_private_subnet_2" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "poc-private-subnet"
+    Name = "de-etl-private-subnet_2"
   }
 }
 
@@ -67,7 +67,7 @@ resource "aws_route_table" "docdb_vpc_public_subnet_route_table" {
   }
 
   tags = {
-    Name = "poc-public-rt"
+    Name = "de-etl-public-rt"
   }
 }
 

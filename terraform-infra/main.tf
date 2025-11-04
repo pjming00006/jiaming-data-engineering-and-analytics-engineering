@@ -76,6 +76,8 @@ module "documentdb_dms" {
   project_etl_s3_bucket_arn = module.s3_datalake.etl_s3_bucket_arn
   dms_service_role_id = module.iam.dms_service_role_id
   dms_service_role_name = module.iam.dms_service_role_name
+  dms_service_role_arn = module.iam.dms_service_role_arn
+  dms_subnet_group_ids = module.vpc.private_subnet_ids
   aws_account_id = data.aws_caller_identity.current.account_id
   project_tag = var.project_tag
   current_ip_address = data.external.myipaddr.result.ip

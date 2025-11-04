@@ -21,6 +21,14 @@ variable "dms_service_role_name" {
   type = string
 }
 
+variable "dms_service_role_arn" {
+  type = string
+}
+
+variable "dms_subnet_group_ids" {
+  type = list
+}
+
 variable "aws_account_id" {
   type = string
 }

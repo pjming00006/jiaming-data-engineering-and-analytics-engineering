@@ -89,12 +89,37 @@ resource "aws_iam_role" "dms_service_role" {
         {
             "Effect": "Allow",
             "Principal": {
+                "Service": ["dms.amazonaws.com", "dms.us-east-1.amazonaws.com"]
+            },
+            "Action": "sts:AssumeRole"
+        },
+    ]
+  })
+}
+
+# This IAM role is required for DMS to create a aws_dms_replication_subnet_group
+# The name dms-vpc-role is required and cannot be changed
+resource "aws_iam_role" "dms_vpc_role" {
+  name = "dms-vpc-role"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
                 "Service": "dms.amazonaws.com"
             },
             "Action": "sts:AssumeRole"
-        }
+        },
     ]
   })
+}
+
+
+resource "aws_iam_role_policy_attachment" "vpc_management_dms_vpc_role_attachment" {
+  role       = aws_iam_role.dms_vpc_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
 output "dms_service_role_id" {
@@ -103,5 +128,9 @@ output "dms_service_role_id" {
 
 output "dms_service_role_name" {
   value = aws_iam_role.dms_service_role.name
+}
+
+output "dms_service_role_arn" {
+  value = aws_iam_role.dms_service_role.arn
 }
 

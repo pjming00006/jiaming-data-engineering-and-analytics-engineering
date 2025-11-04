@@ -53,6 +53,10 @@ resource "aws_subnet" "docdb_vpc_private_subnet_2" {
   }
 }
 
+output "private_subnet_ids" {
+  value = [aws_subnet.docdb_vpc_private_subnet.id, aws_subnet.docdb_vpc_private_subnet_2.id]
+}
+
 # Create a route table for the subnet
 resource "aws_route_table" "docdb_vpc_public_subnet_route_table" {
   vpc_id = aws_vpc.docdb_vpc.id

@@ -2,10 +2,9 @@
 
 .terraform/
 .terraform.lock.hcl
+*.tfstate.*
 *.tfstate
-*.tfstate.
-*.tfstate.backup
-*.tfstate.*.backup
+tfstate.*
 crash.log
 
 --- DBT Local Resources ---

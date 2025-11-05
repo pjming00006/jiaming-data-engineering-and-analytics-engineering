@@ -67,6 +67,14 @@ resource "aws_route_table" "de_etl_vpc_public_subnet_route_table" {
   }
 }
 
+resource "aws_route_table" "de_etl_vpc_private_subnet_route_table" {
+  vpc_id = aws_vpc.de_etl_vpc.id
+
+  tags = {
+    Name = "de-etl-private-rt"
+  }
+}
+
 # Associate subnet with route table
 resource "aws_route_table_association" "docdb_vpc_subnet_assoc" {
   subnet_id      = aws_subnet.de_etl_vpc_public_subnet.id
@@ -77,6 +85,10 @@ resource "aws_vpc_endpoint" "etl_vpc_s3_endpoint" {
   vpc_id            = aws_vpc.de_etl_vpc.id
   service_name      = "com.amazonaws.us-east-1.s3"
   vpc_endpoint_type = "Gateway"
+
+  route_table_ids = [
+    aws_route_table.de_etl_vpc_private_subnet_route_table.id
+  ]
 
   private_dns_enabled = false
 

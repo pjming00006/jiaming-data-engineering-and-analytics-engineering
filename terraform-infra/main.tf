@@ -26,6 +26,10 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
+data "external" "myipaddr" {
+program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
+}
+
 module "s3_datalake" {
   source = "./s3_datalake"
   etl_s3_bucket_name = var.etl_s3_bucket_name
@@ -35,8 +39,8 @@ module "iam" {
   source = "./iam"
 }
 
-data "external" "myipaddr" {
-program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
+module "vpc" {
+  source = "./vpc"
 }
 
 module "dynamodb_etl" {
@@ -87,6 +91,7 @@ module "documentdb_dms" {
   utils_file_path = var.utils_file_path
 }
 
-module "vpc" {
-  source = "./vpc"
+module "emr_spark" {
+  source = "./emr_spark"
+  emr_vpc_id = module.vpc.docdb_vpc_id
 }

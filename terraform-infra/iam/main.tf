@@ -134,3 +134,78 @@ output "dms_service_role_arn" {
   value = aws_iam_role.dms_service_role.arn
 }
 
+
+# IAM role for EMR
+resource "aws_iam_role" "emr_service_role" {
+  name = "emr-service-role"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "elasticmapreduce.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "emr_service_permission_emr_service_role_attachment" {
+  role       = aws_iam_role.emr_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceRole"
+}
+
+# IAM role for EC2 instances used by EMR
+resource "aws_iam_role" "emr_ec2_instance_role" {
+  name = "emr-ec2-instance-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Effect" = "Allow"
+        "Principal" = { 
+          "Service" = "ec2.amazonaws.com" 
+        },
+        "Action"   = "sts:AssumeRole"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "emr_ec2_permission_emr_ec2_instance_role_attachment" {
+  role       = aws_iam_role.emr_ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonElasticMapReduceforEC2Role"
+}
+
+# Wrapper for the IAM role. EC2 would use this
+resource "aws_iam_instance_profile" "emr_ec2_instance_profile" {
+  name = "emr_ec2_default_role"
+  role = aws_iam_role.emr_ec2_instance_role.name
+}
+
+# IAM for using emr steps
+resource "aws_iam_role" "emr_step_role" {
+  name = "emr-step-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Effect" = "Allow"
+        "Principal" = { 
+          "Service" = "elasticmapreduce.amazonaws.com"
+        },
+        "Action"   = "sts:AssumeRole"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "emr_step_permission_emr_step_role_attachment" {
+  role       = aws_iam_role.emr_step_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}

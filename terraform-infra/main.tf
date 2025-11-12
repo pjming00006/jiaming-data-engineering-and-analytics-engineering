@@ -73,23 +73,23 @@ module "dbt_analytics" {
     project_tag = var.project_tag
 }
 
-module "documentdb_dms" {
-  source = "./documentdb_dms"
-  project_aws_region =  var.aws_region
-  project_etl_s3_bucket_name =  var.etl_s3_bucket_name
-  project_etl_s3_bucket_arn = module.s3_datalake.etl_s3_bucket_arn
-  dms_service_role_id = module.iam.dms_service_role_id
-  dms_service_role_name = module.iam.dms_service_role_name
-  dms_service_role_arn = module.iam.dms_service_role_arn
-  dms_subnet_group_ids = module.vpc.private_subnet_ids
-  aws_account_id = data.aws_caller_identity.current.account_id
-  project_tag = var.project_tag
-  current_ip_address = data.external.myipaddr.result.ip
-  docdb_vpc_id = module.vpc.docdb_vpc_id
-  docdb_vpc_public_subnet_id = module.vpc.de_etl_vpc_public_subnet_id
-  docdb_vpc_private_subnet_id = module.vpc.de_etl_vpc_private_subnet_id
-  utils_file_path = var.utils_file_path
-}
+# module "documentdb_dms" {
+#   source = "./documentdb_dms"
+#   project_aws_region =  var.aws_region
+#   project_etl_s3_bucket_name =  var.etl_s3_bucket_name
+#   project_etl_s3_bucket_arn = module.s3_datalake.etl_s3_bucket_arn
+#   dms_service_role_id = module.iam.dms_service_role_id
+#   dms_service_role_name = module.iam.dms_service_role_name
+#   dms_service_role_arn = module.iam.dms_service_role_arn
+#   dms_subnet_group_ids = module.vpc.private_subnet_ids
+#   aws_account_id = data.aws_caller_identity.current.account_id
+#   project_tag = var.project_tag
+#   current_ip_address = data.external.myipaddr.result.ip
+#   docdb_vpc_id = module.vpc.docdb_vpc_id
+#   docdb_vpc_public_subnet_id = module.vpc.de_etl_vpc_public_subnet_id
+#   docdb_vpc_private_subnet_id = module.vpc.de_etl_vpc_private_subnet_id
+#   utils_file_path = var.utils_file_path
+# }
 
 module "emr_spark" {
   source = "./emr_spark"

@@ -28,6 +28,7 @@ Standard Python cache/build files
 pycache/
 *.pyc
 .venv/
+.DS_Store
 
 --- Lambda/Code Deployment Artifacts ---
 

@@ -81,6 +81,34 @@ resource "aws_route_table_association" "docdb_vpc_subnet_assoc" {
   route_table_id = aws_route_table.de_etl_vpc_public_subnet_route_table.id
 }
 
+resource "aws_security_group" "vpc_ssh_current_ip_sg" {
+  name        = "de_etl_vpc_ssh_security_group"
+  description = "Security group allowing ssh trafic to EC2 instance"
+  vpc_id      = aws_vpc.de_etl_vpc.id
+
+  ingress {
+    description = ""
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.current_ip_address}/32"] # Allowing ssh from current ip
+  }
+}
+
+resource "aws_security_group" "vpc_ssh_public_sg" {
+  name        = "de_etl_vpc_ssh_from_internet_security_group"
+  description = "Security group allowing ssh trafic to EC2 instance from Internet"
+  vpc_id      = aws_vpc.de_etl_vpc.id
+
+  ingress {
+    description = ""
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_vpc_endpoint" "etl_vpc_s3_endpoint" {
   vpc_id            = aws_vpc.de_etl_vpc.id
   service_name      = "com.amazonaws.us-east-1.s3"

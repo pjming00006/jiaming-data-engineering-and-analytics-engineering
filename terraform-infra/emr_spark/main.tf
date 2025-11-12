@@ -1,3 +1,4 @@
+# TODO: The EMR EC2 role doesn't work. Figure out why
 resource "aws_security_group" "emr_master_sg" {
   name   = "emr-master-sg"
   vpc_id = var.emr_vpc_id

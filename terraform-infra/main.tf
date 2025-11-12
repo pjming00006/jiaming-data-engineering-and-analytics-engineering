@@ -41,6 +41,7 @@ module "iam" {
 
 module "vpc" {
   source = "./vpc"
+  current_ip_address = data.external.myipaddr.result.ip
 }
 
 module "dynamodb_etl" {

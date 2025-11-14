@@ -37,6 +37,7 @@ module "s3_datalake" {
 
 module "iam" {
   source = "./iam"
+  account_id = data.aws_caller_identity.current.account_id
 }
 
 module "vpc" {

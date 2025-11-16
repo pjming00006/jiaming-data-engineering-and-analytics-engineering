@@ -135,7 +135,7 @@ output "dms_service_role_arn" {
 }
 
 
-# IAM role for EMR
+# IAM role for EMR. The specific policies are created by EMR and it's specific to cluster, VPC, and subnets
 resource "aws_iam_role" "emr_service_role" {
   name = "AmazonEMR-ServiceRole-20251113T214259"
   path = "/service-role/"
@@ -160,7 +160,7 @@ resource "aws_iam_role" "emr_service_role" {
   }
 }
 
-# IAM role for EC2 instances used by EMR
+# IAM role for EC2 instances used by EMR. The specific policies are created by EMR and it's specific to cluster, VPC, and subnets
 resource "aws_iam_role" "emr_ec2_instance_role" {
   name = "AmazonEMR-InstanceProfile-20251113T214243"
   path = "/service-role/"

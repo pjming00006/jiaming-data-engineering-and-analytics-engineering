@@ -1,0 +1,16 @@
+services:
+  airflow-scheduler:
+    volumes:
+      - ~/.aws:/home/airflow/.aws:ro
+
+  airflow-worker:
+    volumes:
+      - ~/.aws:/home/airflow/.aws:ro
+
+  airflow-dag-processor:
+    volumes:
+      - ~/.aws:/home/airflow/.aws:ro
+
+  airflow-apiserver:
+    volumes:
+      - ~/.aws:/home/airflow/.aws:ro

@@ -7,6 +7,11 @@
 tfstate.*
 crash.log
 
+-- Airflow Local Resoureces ---
+airflow/config/*
+airflow/logs/*
+airflow/.env
+
 --- DBT Local Resources ---
 dbt-analytics/.user.yml
 dbt-analytics/profiles.yml

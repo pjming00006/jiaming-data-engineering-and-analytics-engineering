@@ -96,4 +96,7 @@ module "dbt_analytics" {
 module "emr_spark" {
   source = "./emr_spark"
   emr_vpc_id = module.vpc.docdb_vpc_id
+  emr_public_subnet_id = module.vpc.de_etl_vpc_public_subnet_id
+  account_id = data.aws_caller_identity.current.account_id
+  emr_service_role_name = module.iam.emr_service_role_name
 }

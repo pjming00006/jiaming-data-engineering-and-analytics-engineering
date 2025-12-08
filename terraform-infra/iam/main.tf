@@ -137,8 +137,8 @@ output "dms_service_role_arn" {
 
 # IAM role for EMR. The specific policies are created by EMR and it's specific to cluster, VPC, and subnets
 resource "aws_iam_role" "emr_service_role" {
-  name = "AmazonEMR-ServiceRole-20251113T214259"
-  path = "/service-role/"
+  name        = "emr-service-role"
+  description = "Allows Elastic MapReduce to call AWS services such as EC2 on your behalf."
 
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
@@ -152,12 +152,15 @@ resource "aws_iam_role" "emr_service_role" {
         },
     ]
   })
+}
 
-  lifecycle {
-    ignore_changes = [ 
-      managed_policy_arns
-     ]
-  }
+resource "aws_iam_role_policy_attachment" "emr_service_role_policy_emr_service_role_attachment" {
+  role       = aws_iam_role.emr_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEMRServicePolicy_v2"
+}
+
+output "emr_service_role_name" {
+  value = aws_iam_role.emr_service_role.name
 }
 
 # IAM role for EC2 instances used by EMR. The specific policies are created by EMR and it's specific to cluster, VPC, and subnets

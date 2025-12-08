@@ -165,8 +165,7 @@ output "emr_service_role_name" {
 
 # IAM role for EC2 instances used by EMR. The specific policies are created by EMR and it's specific to cluster, VPC, and subnets
 resource "aws_iam_role" "emr_ec2_instance_role" {
-  name = "AmazonEMR-InstanceProfile-20251113T214243"
-  path = "/service-role/"
+  name = "emr-ec2-instance-role"
 
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
@@ -180,12 +179,19 @@ resource "aws_iam_role" "emr_ec2_instance_role" {
         }
     ]
   })
+}
 
-  lifecycle {
-    ignore_changes = [ 
-      managed_policy_arns
-     ]
-  }
+resource "aws_iam_instance_profile" "emr_instance_profile" {
+  name = "emr-instance-profile"
+  role = aws_iam_role.emr_ec2_instance_role.name
+}
+
+output "emr_ec2_instance_role_arn" {
+  value = aws_iam_role.emr_ec2_instance_role.arn
+}
+
+output "emr_ec2_instance_role_name" {
+  value = aws_iam_role.emr_ec2_instance_role.name
 }
 
 # IAM for using emr steps

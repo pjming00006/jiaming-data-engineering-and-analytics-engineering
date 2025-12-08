@@ -99,4 +99,7 @@ module "emr_spark" {
   emr_public_subnet_id = module.vpc.de_etl_vpc_public_subnet_id
   account_id = data.aws_caller_identity.current.account_id
   emr_service_role_name = module.iam.emr_service_role_name
+  emr_ec2_instance_role_arn = module.iam.emr_ec2_instance_role_arn
+  emr_ec2_instance_role_name = module.iam.emr_ec2_instance_role_name
+  project_etl_s3_bucket_name = var.etl_s3_bucket_name
 }

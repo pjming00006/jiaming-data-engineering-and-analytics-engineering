@@ -78,7 +78,7 @@ resource "aws_iam_policy" "emr_service_role_policy" {
             "Sid": "PassRoleForEC2",
             "Effect": "Allow",
             "Action": "iam:PassRole",
-            "Resource": "arn:aws:iam::${var.account_id}:role/service-role/AmazonEMR-InstanceProfile-20251113T214243",
+            "Resource": "${var.emr_ec2_instance_role_arn}",
             "Condition": {
                 "StringLike": {
                     "iam:PassedToService": "ec2.amazonaws.com"
@@ -92,4 +92,28 @@ resource "aws_iam_policy" "emr_service_role_policy" {
 resource "aws_iam_role_policy_attachment" "emr_service_role_policy_emr_service_role_attachment" {
   role       = var.emr_service_role_name
   policy_arn = aws_iam_policy.emr_service_role_policy.arn
+}
+
+resource "aws_iam_policy" "de_etl_s3_policy" {
+  name = "comprehensive-s3-access-to-de-etl-bucket"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ComprehensiveS3AccessForETLBucket",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::${var.project_etl_s3_bucket_name}",
+                "arn:aws:s3:::${var.project_etl_s3_bucket_name}/*"
+            ]
+        }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "s3_access_policy_emr_ec2_instance_role_attachment" {
+  role       = var.emr_ec2_instance_role_name
+  policy_arn = aws_iam_policy.de_etl_s3_policy.arn
 }

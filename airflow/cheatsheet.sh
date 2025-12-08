@@ -13,3 +13,10 @@ airflow dags list
 
 # to see logs from host (without entering):
 docker compose logs -f airflow-webserver
+
+# Get python requirements from container
+docker compose exec airflow-apiserver pip freeze > requirements.txt
+
+
+# Refereh dags
+airflow dags reserialize

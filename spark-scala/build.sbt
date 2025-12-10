@@ -16,7 +16,8 @@ val sparkVersion = "3.5.6"
 // For EMR
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
-  "org.apache.spark" %% "spark-sql"  % sparkVersion % "provided"
+  "org.apache.spark" %% "spark-sql"  % sparkVersion % "provided",
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.12.568",
 )
 
 assembly / assemblyMergeStrategy := {

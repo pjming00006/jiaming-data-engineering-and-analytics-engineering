@@ -46,6 +46,9 @@ object Test {
         println("No file found")
     }
 
+    val (fileBucket, filePrefix) = S3Utils.breakS3Path("s3://etl-poc-2025-b8a9c11/spark-scala/userDimensionCdcFull/00018/Checkpoint/checkpoint.json", false)
+    println(f"Testing S3Utils.breakS3Path: fileBucket: ${fileBucket}, prefix: ${filePrefix}")
+
     System.exit(0)
   }
 }

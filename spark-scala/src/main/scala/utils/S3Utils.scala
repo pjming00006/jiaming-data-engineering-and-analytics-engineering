@@ -9,13 +9,19 @@ import java.time.format.DateTimeFormatter
 
 object S3Utils {
   // s3 client shared across util functions
-  private val s3 = AmazonS3ClientBuilder.defaultClient()
+  val s3 = AmazonS3ClientBuilder.defaultClient()
 
-  def breakS3Path(s3Path: String): (String, String) = {
+  def breakS3Path(s3Path: String, isFolder: Boolean = true): (String, String) = {
     val path = s3Path.stripPrefix("s3://")
     val parts = path.split("/", 2)
     val bucket = parts(0)
-    val prefix = if (parts.length > 1) parts(1).stripSuffix("/") + "/" else ""
+
+    val prefix = 
+      if (parts.length > 1) {
+        val p = parts(1).stripSuffix("/")  // remove any trailing slash first
+        if (isFolder) p + "/" else p       // add slash only if it's a folder
+      } 
+      else {""}
 
     (bucket, prefix)
   }
@@ -151,4 +157,20 @@ object S3Utils {
     }
   }
 
+  def getFilesBetween(
+    s3Path: String,
+    earliest: Instant,
+    latest: Instant
+  ): Seq[String] = {
+    val (bucket, _) = breakS3Path(s3Path)
+
+    listFiles(s3Path)
+    .filter { f =>
+      val ts = f.getLastModified.toInstant
+      // Not inclusive on lower bound, inclusive on upper bound
+      ts.isAfter(earliest) && !ts.isAfter(latest)
+    }
+    .map(f => s"s3://$bucket/${f.getKey}")
+
+  }
 }

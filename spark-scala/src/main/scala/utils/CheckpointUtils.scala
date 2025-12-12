@@ -4,7 +4,7 @@ import java.time.Instant
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.amazonaws.services.s3.model.PutObjectRequest
-import java.io.ByteArrayInputStream
+import java.io.{ByteArrayInputStream, InputStream}
 
 object CheckpointUtils {
 

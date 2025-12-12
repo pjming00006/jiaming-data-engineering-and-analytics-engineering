@@ -22,6 +22,8 @@ object UserDimensionTransformer {
       .appName("user-dimension-job")
     //   .master("local[*]")
       .getOrCreate()
+
+    logger.info(f"Application user-dimension-job started running with ${mode} mode...")
     
     // Get target version
     val currVersion = S3Utils.getVersion(targetPath)
@@ -43,44 +45,53 @@ object UserDimensionTransformer {
               case None             => throw new Exception("No latest file found")
     }
 
-    if (mode == "full") {
-      val (earliestFile, earliestFileTs) =
-        S3Utils.getTargetS3File(sourcePath, None, false) match {
-            case Some((file, ts)) => (file, ts)
-            case None             => throw new Exception("No earliest file found")
+    val maybeEarliest: Option[(String, Instant)] =
+      if (mode == "full") {
+        S3Utils.getTargetS3File(sourcePath, None, false)
+      } 
+      else {
+        val latestVersionCheckpointPath = targetPath + currVersion + "/" + checkpointFilePrefix
+        val checkpoint = CheckpointUtils.readCheckpoint(latestVersionCheckpointPath)
+        val checkpointTs = Instant.parse(checkpoint.latest_ts)
+        logger.info(s"Checkpoint found at $latestVersionCheckpointPath, latest file: ${checkpoint.latest_file}")
+
+        S3Utils.getTargetS3File(sourcePath, Some(checkpointTs), false)
       }
 
-      // In full load mode, read all files in source path
-      val df = spark.read.parquet(sourcePath)
+
+    val (earliestFile, earliestFileTs) = maybeEarliest match {
+      case Some((file, ts)) => (file, ts)
+      case None =>
+        if (mode == "incremental") {
+          logger.info("No new files to process; exiting incremental run.")
+          spark.stop()
+          System.exit(0)
+          ("", Instant.EPOCH) // dummy, won't be used
+        } else {
+          throw new Exception("No earliest file found in full load")
+        }
     }
 
-    else {
-      // Read latest version checkpoint.json, get latest checkpoint and last modified
-      val latestVersionCheckpointPath = targetPath + currVersion + "/" + checkpointFilePrefix
-      val checkpoint = CheckpointUtils.readCheckpoint(latestVersionCheckpointPath)
-      val checkpointTs = Instant.parse(checkpoint.latest_ts)
+    var df: DataFrame = null
 
-      // Find the earliest file after the latest file processed in the last checkpoint
-      val (earliestFile, earliestFileTs) =
-        S3Utils.getTargetS3File(sourcePath, Some(checkpointTs), false) match {
-            case Some((file, ts)) => (file, ts)
-            case None             => throw new Exception("No earliest file found")
-      }
-
-      // In incremental load mode, read files in range
+    if (mode == "full") {
+      df = spark.read.parquet(sourcePath)
+    } else {
+      // incremental
       val targetFileList =
         if (earliestFileTs != latestFileTs) {
-            S3Utils.getFilesBetween(sourcePath, earliestFileTs, latestFileTs)
-        } else {
-            Seq(earliestFile)   // only one file in range
-        }
+          S3Utils.getFilesBetween(sourcePath, earliestFileTs, latestFileTs)
+        } else Seq(earliestFile)
+
+      if (targetFileList.isEmpty) {
+        logger.info("No new files to process; exiting incremental run.")
+        spark.stop()
+        System.exit(0)
+      }
 
       val sourceLoadDf = spark.read.parquet(targetFileList: _*)
-
-      val latestVersionDataPath = targetPath + currVersion + "/" + dataFolder
-      val latestTargetDf = spark.read.parquet(latestVersionDataPath)
-
-      val df = sourceLoadDf.unionAll(latestTargetDf)
+      val latestTargetDf = spark.read.parquet(targetPath + currVersion + "/" + dataFolder)
+      df = sourceLoadDf.union(latestTargetDf)
     }
 
     // SCD Type 1 processing

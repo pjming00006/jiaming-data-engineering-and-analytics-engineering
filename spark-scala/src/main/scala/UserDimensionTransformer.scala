@@ -3,6 +3,7 @@ import java.time.Instant
 import org.apache.spark.sql.{SparkSession, DataFrame}
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types._
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
@@ -21,9 +22,18 @@ object UserDimensionTransformer {
     val spark = SparkSession.builder()
       .appName("user-dimension-job")
     //   .master("local[*]")
+      .config("spark.sql.parquet.int96AsTimestamp", "true")
       .getOrCreate()
 
     logger.info(f"Application user-dimension-job started running with ${mode} mode...")
+
+    // Input Schema
+    val inputSchema = StructType(Seq(
+      StructField("user_id", StringType, nullable = false),
+      StructField("cdc_type", StringType, nullable = false),
+      StructField("processing_timestamp", StringType, true), // Upstream data type is string
+      StructField("user_attributes", StringType, nullable = true)
+    ))
     
     // Get target version
     val currVersion = S3Utils.getVersion(targetPath)
@@ -75,7 +85,7 @@ object UserDimensionTransformer {
     var df: DataFrame = null
 
     if (mode == "full") {
-      df = spark.read.parquet(sourcePath)
+      df = spark.read.schema(inputSchema).parquet(sourcePath).withColumn("processing_timestamp", to_timestamp(col("processing_timestamp")))
     } else {
       // incremental
       val targetFileList =
@@ -89,14 +99,15 @@ object UserDimensionTransformer {
         System.exit(0)
       }
 
-      val sourceLoadDf = spark.read.parquet(targetFileList: _*)
-      val latestTargetDf = spark.read.parquet(targetPath + currVersion + "/" + dataFolder)
+      val sourceLoadDf = spark.read.schema(inputSchema).parquet(targetFileList: _*).withColumn("processing_timestamp", to_timestamp(col("processing_timestamp")))
+      val latestTargetDf = spark.read.schema(inputSchema).parquet(targetPath + currVersion + "/" + dataFolder).withColumn("processing_timestamp", to_timestamp(col("processing_timestamp")))
       df = sourceLoadDf.union(latestTargetDf)
     }
 
     // SCD Type 1 processing
     val windowSpec = Window.partitionBy("user_id").orderBy(col("processing_timestamp").desc)
-    val df_rk = df.withColumn("rk", row_number().over(windowSpec)).filter("rk = 1").drop("rk")
+    // Convert back to string for consistency
+    val df_rk = df.withColumn("rk", row_number().over(windowSpec)).filter("rk = 1").drop("rk").select(inputSchema.map(f => col(f.name)):_*).withColumn("processing_timestamp", col("processing_timestamp").cast("string"))
 
     // --- Write result back to S3 ---
     CheckpointUtils.generateCheckpoint(outputCheckpointPath, mode, earliestFile, earliestFileTs, latestFile, latestFileTs)

@@ -46,4 +46,13 @@ object CheckpointUtils {
       new PutObjectRequest(bucket, prefix, stream, null)
     )
   }
+
+  def readCheckpoint(s3Path: String): Checkpoint = {
+    val (bucket, key) = S3Utils.breakS3Path(s3Path, isFolder = false)
+    val s3Object = S3Utils.s3.getObject(bucket, key)
+    val inputStream: InputStream = s3Object.getObjectContent
+    val checkpoint = mapper.readValue(inputStream, classOf[Checkpoint])
+    inputStream.close()
+    checkpoint
+  }
 }

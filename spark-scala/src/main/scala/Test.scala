@@ -18,10 +18,10 @@ object Test {
     val nextVersion = S3Utils.getNextVersion(currVersion)
     println(s"Testing S3Utils.getNextVersion: nextVersion: $nextVersion")
 
-    val latestPartition = S3Utils.findTargetPartition(s3Path)
+    val latestPartition = S3Utils.findTargetPartition(userDimensionPath)
     println(s"Testing S3Utils.findTargetPartition: latestPartition: $latestPartition")
 
-    val earliestPartition = S3Utils.findTargetPartition(s3Path, false)
+    val earliestPartition = S3Utils.findTargetPartition(userDimensionPath, false)
     println(s"Testing S3Utils.findTargetPartition: earliestPartition: $earliestPartition")
 
     S3Utils.getTargetS3File(s3Path, None) match {
